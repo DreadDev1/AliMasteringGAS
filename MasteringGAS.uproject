@@ -3,6 +3,16 @@
 	"EngineAssociation": "{8D9FC90D-4CB8-2975-D9B8-DBB159F1C522}",
 	"Category": "",
 	"Description": "",
+	"Modules": [
+		{
+			"Name": "MasteringGAS",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
+		}
+	],
 	"Plugins": [
 		{
 			"Name": "ModelingToolsEditorMode",
