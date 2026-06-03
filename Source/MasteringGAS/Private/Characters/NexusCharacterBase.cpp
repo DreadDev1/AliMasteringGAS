@@ -9,14 +9,19 @@
 ANexusCharacterBase::ANexusCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	// Set Collision Capsule Size
+	GetCapsuleComponent()->InitCapsuleSize(35.f, 90.0f);
 	
+#pragma region AbilitySystemComponent & AttributeSet Initialization
 	//Add Ability System Component
 	NexusASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("NexusASC"));
 	NexusASC->SetIsReplicated(true);
 	NexusASC->SetReplicationMode(ASCReplicationMode);
-	
-	// Set Collision Capsule Size
-	GetCapsuleComponent()->InitCapsuleSize(35.f, 90.0f);
+
+	// Add BaseAttributeSet
+	BaseAttributeSet = CreateDefaultSubobject<UBaseAttributeSet>(TEXT("BaseAttributeSet"));
+#pragma endregion
 	
 #pragma region Character Rotation and Movement Settings
 	//Disable rotation when the Controller rotates
@@ -36,7 +41,7 @@ ANexusCharacterBase::ANexusCharacterBase()
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.f;
 #pragma endregion
 }
-
+	
 void ANexusCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();

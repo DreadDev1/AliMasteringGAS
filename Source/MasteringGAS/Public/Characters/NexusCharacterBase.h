@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayAbilitiySystem/AttributeSets/BaseAttributeSet.h"
 #include "NexusCharacterBase.generated.h"
 
 UCLASS()
@@ -18,6 +19,9 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NexusASC")
 	UAbilitySystemComponent* NexusASC;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NexusASC|Attributes")
+	UBaseAttributeSet* BaseAttributeSet;
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NexusASC")
