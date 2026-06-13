@@ -3,6 +3,7 @@
 
 #include "Characters/NexusCharacterBase.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -50,7 +51,11 @@ void ANexusCharacterBase::BeginPlay()
 void ANexusCharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-	if (NexusASC) { NexusASC->InitAbilityActorInfo(this, this); }
+	if (NexusASC)
+	{
+		NexusASC->InitAbilityActorInfo(this, this);
+		GrantAbilities(StartingAbilities);
+	}
 }
 
 void ANexusCharacterBase::OnRep_PlayerState()
@@ -73,5 +78,40 @@ void ANexusCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInput
 UAbilitySystemComponent* ANexusCharacterBase::GetAbilitySystemComponent() const
 {
 	return NexusASC;
+}
+
+TArray<FGameplayAbilitySpecHandle> ANexusCharacterBase::GrantAbilities(TArray<TSubclassOf<UGameplayAbility>> AbilitiesToGrant)
+{
+	if (!NexusASC ||!HasAuthority())
+	{
+		return TArray<FGameplayAbilitySpecHandle>();
+	} 
+	
+	TArray<FGameplayAbilitySpecHandle> AbilityHandlesToGrant;
+	for (TSubclassOf<UGameplayAbility> Ability : AbilitiesToGrant)
+	{
+		FGameplayAbilitySpecHandle SpecHandle = NexusASC->GiveAbility(FGameplayAbilitySpec(Ability, 1.f, -1.f, this));
+		AbilityHandlesToGrant.Add(SpecHandle);
+	}
+	SendAbilitiesChangedEvent();
+	
+	return AbilityHandlesToGrant;
+}
+
+void ANexusCharacterBase::RemoveAbilities(TArray<FGameplayAbilitySpecHandle> AbilityHandlesToRemove)
+{
+	if (!NexusASC ||!HasAuthority()) { return; } 
+	for (FGameplayAbilitySpecHandle AbilityHandle : AbilityHandlesToRemove) { NexusASC->ClearAbility(AbilityHandle); }
+	SendAbilitiesChangedEvent();
+}
+
+void ANexusCharacterBase::SendAbilitiesChangedEvent()
+{
+	FGameplayEventData EventData;
+	EventData.EventTag == FGameplayTag::RequestGameplayTag(FName("Nexus.Event.Abilities.Changed"));
+	EventData.Instigator = this;
+	EventData.Target = this;
+	
+	 UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, EventData.EventTag, EventData);
 }
 
